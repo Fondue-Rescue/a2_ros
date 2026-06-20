@@ -1,16 +1,12 @@
-# a2_ros
+# A2 ROS2 Workspace
+
+<p align="center">
+  <img src="docs/a2.png" alt="Unitree A2 quadruped" width="100%">
+</p>
 
 ROS2 (Jazzy) simulation of the Unitree A2 quadruped using MuJoCo and a trained RL locomotion policy.
 
-## TODOs
-
-> **CRITICAL**
-> - [ ] `pathFollower` / `localPlanner` autonomy mode is overridden to `false` by the joystick node on every `/joy` message (axes[4] < 0.1 at rest). The `autonomyMode: True` launch parameter has no effect while a controller is connected. Either kill `joy_node` before running nav (`ros2 node kill /joy_node`), push the right stick forward to hold axes[4] > 0.1, or patch pathFollower/localPlanner to only respect the joystick override when `joySpeedRaw > 0`.
-> - [ ] Move `registered_scan` publisher out of `a2_sim_utils` into a standalone `a2_utils` node so it can be used with real hardware and DLIO without a sim dependency (see DLIO integration notes below).
-
-- [ ] Remove all source code from meta-package `a2_ros` and only maintain dependencies
-
-## Setup with Docker
+## 🐳 Setup with Docker
 
 ### Prerequisites
 1. Install [Docker](https://docs.docker.com/engine/install/). Note Linux systems need Docker Engine **not Docker Desktop**, MacOS needs Docker Desktop, Windows TBD.
@@ -38,13 +34,15 @@ The `.env` file is gitignored and personal to your machine. It is also sourced b
 | `ZENOH_ROUTER_IP_SIM` | Router address sim nodes connect to | `127.0.0.1` |
 | `ZENOH_ROUTER_IP_ROBOT` | Router address robot nodes connect to | `127.0.0.1` |
 | `ZENOH_ROUTER_IP` | Shared fallback used if the per-profile vars are unset | `127.0.0.1` |
-| `ROS_BAGS_DIR` | Host directory bind-mounted to `/a2_ros/bags` | `./bags` |
+| `ROS_BAGS_DIR` | Host directory bind-mounted to `/a2_ros_ws/bags` | `./bags` |
 
 ### Build and spawn
 ```bash
 docker compose build a2_ros_dev
 docker compose up -d a2_ros_dev
 ```
+
+> `a2_ros_dev` builds on top of the prebuilt **`a2_base`** image, which CI publishes multi-arch (x86_64 **and** arm64 — Apple Silicon works) to GHCR. The base is therefore **pulled, not built locally**. After CI publishes a new base, refresh it with `docker compose build --pull a2_ros_dev` (a plain `build` keeps the cached base). To build the base yourself instead, set `A2_BASE_IMAGE=a2_ros:base` and run `docker compose build a2_base` first.
 
 Enter the container:
 ```bash
@@ -79,11 +77,6 @@ scripts/start_zenoh_router.sh
 
 > Run only **one** router per host — `zenoh_router_sim` and `zenoh_router_robot` both bind TCP `7447`. For a multi-machine setup, run the router on one host and set `ZENOH_ROUTER_IP_SIM` / `ZENOH_ROUTER_IP_ROBOT` in `.env` on the others.
 
-**Note:** Build artifacts are stored in Docker named volumes, so cleaning the workspace requires deleting the contents rather than the directories:
-```bash
-rm -rf build/* install/* log
-```
-
 ### Stopping
 ```bash
 docker compose stop a2_ros_dev       # pause, keeps volumes
@@ -91,7 +84,7 @@ docker compose down                  # stop and remove containers
 docker compose down -v               # also remove volumes (wipes build cache)
 ```
 
-## Meta Packages
+## 📦 Meta Packages
 
 The `src/meta_packages/` directory contains stack-level packages. Each one declares `exec_depend` entries for a particular deployment scenario — build it with `colcon build --packages-up-to <name>` to pull in all required dependencies. All launch files and config live in `a2_ros` and are launched from there, except `a2_pc2` which runs on a separate compute unit and owns its own launch files.
 
@@ -113,66 +106,122 @@ colcon build --packages-up-to a2_robot   # real robot
 colcon build --packages-up-to a2_sim_full  # simulation with perception
 ```
 
-## Launching Subsystems
+## 🚀 Launching Subsystems
 
 All launch files live in `a2_ros`. Use the `a2` CLI to invoke them:
 
 | Command | Launch file | Description |
 |---|---|---|
-| `a2 start [--rviz] [--dlio]` | `sim.launch.py` | MuJoCo simulation + locomotion controller |
+| `a2 sim [--rviz] [--dlio] [--scene <file>]` | `sim.launch.py` | MuJoCo simulation + locomotion controller |
 | `a2 nav [--rviz]` | `navigation.launch.py` | CMU navigation stack (terrain analysis + path planner) |
 | `a2 explore [--rviz]` | `exploration.launch.py` | Autonomous exploration (TARE planner) |
 | `a2 dlio [--rviz]` | `dlio.launch.py` | DLIO LiDAR-inertial odometry |
-| — | `real.launch.py` | Real robot — locomotion executor + bridge (NUC) |
-| — | `teleop_joy.launch.py` | Joystick teleop |
+| `a2 detect` | `object_detection.launch.py` | Object detection (ONNX Runtime); uses `object_detection_real.launch.py` on the robot |
 
-For `a2_pc2` (run directly on the second compute unit):
-```bash
-ros2 launch a2_pc2 pc2.launch.py
-ros2 launch a2_pc2 camera.launch.py
-```
+**`a2 sim` options:**
+- `--rviz` — also open RViz.
+- `--dlio` — use DLIO for odometry instead of ground-truth TF (run `a2 dlio` in another terminal).
+- `--scene <file>` — pick the MuJoCo scene: `scene.xml` (default), `scene_flat.xml`, `scene_terrain.xml`, `scene_obstacles.xml`, `scene_maze.xml`, `scene_test_meshes.xml`.
+
+> Running on the second compute unit (**pc2**)? Its setup and launch live in [`docs/pc2.md`](docs/pc2.md).
 
 ### Typical simulation workflow
 
 **Terminal 1 — simulation:**
 ```bash
-a2 start
+a2 sim
 ```
 
-**Terminal 2 — walk:**
+**Terminal 2 — bring the robot up, then walk** (run in order):
 ```bash
-a2 walk
+a2 stand     # stand up
+a2 unlock    # release to balance stand
+a2 walk      # start walking
 ```
+Then `a2 stop` to stop moving (keeps balance), and `a2 sit` to sit / stand down.
+
+To drive manually with the keyboard, run `a2 keyboard` in its own terminal once the robot is in walk mode — it publishes `/cmd_vel` from your key presses.
 
 **Terminal 3 — navigation / exploration / odometry:**
+
 ```bash
+# Set a 2D Nav Goal in RViz to send the robot to a target pose.
 a2 nav --rviz
-# or
+# Autonomous Exploration
 a2 explore --rviz
-# or
+# LIO State Estimation
 a2 dlio --rviz
 ```
 
-Set a 2D Nav Goal in RViz to send the robot to a target pose.
+**Terminal 4 — object detection:**
+```bash
+a2 detect
+```
 
-## Gamepad
+## 📊 Visualization (Foxglove)
 
-| Input | Action |
+A prebuilt [Foxglove Studio](https://foxglove.dev/) layout for the full stack ships at
+[`docs/rss26_layout.json`](docs/rss26_layout.json).
+
+Download and install Foxglove Studio from [foxglove.dev/download](https://foxglove.dev/download).
+
+**1. Start the Foxglove bridge** — exposes ROS topics over a WebSocket at `ws://localhost:8765`
+(in sim it is launched with `use_sim_time` so timestamps track `/clock`):
+```bash
+a2 foxglove
+```
+
+**2. Connect and load the layout** in Foxglove Studio (desktop or web app):
+- Add a connection → **Foxglove WebSocket** → `ws://localhost:8765`.
+- **Layouts** → **Import from file…** → select `docs/rss26_layout.json`.
+
+The layout contains:
+
+| Panel | Shows |
 |---|---|
-| Left stick | Forward / strafe |
-| Right stick horizontal | Yaw |
-| X + L2 | Sit |
-| Triangle + L2 | Stand |
-| L2 + R2 | Walk |
+| **3D** | Robot model + TF, front/rear lidar (`/mujoco/front_lidar`, `/mujoco/rear_lidar`), `/registered_scan`, terrain maps, navigation paths/goals, and TARE exploration markers |
+| **Image** | `/camera/image_raw` with object-detection overlays (`/detection_annotations`, `/detections_in_image`) |
+| **Transform Tree** | Live TF tree |
+| **Joystick** | Live gamepad input |
+
+Notes:
+- The `/detection_annotations` overlay only appears when the object-detection node is running (`a2 detect`).
+- Send navigation goals straight from the 3D panel using the `/goal_point` (far_planner) publish control.
+
+## 💾 Recording & Playback
+
+Record ROS 2 topics to MCAP and replay them with the `a2` CLI. Bags are written to the bag directory — `$ROS_BAGS_DIR`, default `/a2_ros_ws/bags` in the container (bind-mounted to `./bags` on the host) — named `bag_<timestamp>[_suffix]`.
+
+**Record** — choose what to capture (`--all`, `--topics`, or a `--config` YAML); stop with Ctrl+C:
+```bash
+a2 bag record --all run1                                    # everything, suffix "run1"
+a2 bag record --all --ignore '/camera/image_raw'           # all except some topics
+a2 bag record --topics '/cmd_vel /odom /registered_scan' nav_test
+```
+A `--config` YAML can set `all:`, `topics:`, and `ignore:` (see `a2 bag record --help`).
+
+**Play back** — pass just the bag name (resolved against the bag dir) or a full path:
+```bash
+a2 bag play bag_<timestamp>_run1                  # from the bag dir
+a2 bag play bag_<timestamp>_run1 --clock --pause  # publish /clock, start paused
+```
+
+## 🎮 Gamepad
+
+> These controls are for driving the **real robot**.
+
+<p align="center">
+  <img src="docs/controller.png" alt="Gamepad controls: left stick = longitudinal/lateral, right stick = yaw, L2+△ steps the FSM to a higher state, L2+X to a lower state, ○ soft stop, PS button on/off" width="85%">
+</p>
 
 
-### Development
+## 🛠️ Development
 Development happens with the `a2_ros_dev` docker compose service. This contains all dependencies to run the stack in simulation along with object detection.
 
 To speed up development, many artifacts are cached using docker volumes. This includes the colcon build artifacts.
 
-#### Cleaning the ROS Workspace
-Since the build artifacts are also a volume, the folders cannot be deleted. However, their contents can be deleted.
+### Cleaning the ROS Workspace
+Colcon build artifacts live in named volumes mounted under `/a2_ros_ws` (`build`, `install`, `log`), so the directories can't be removed — only their contents. Use the `a2` CLI inside the container:
 ```bash
-$ rm -rf build/* install/* log
+a2 clean          # add --yes to skip the confirmation prompt
 ```
