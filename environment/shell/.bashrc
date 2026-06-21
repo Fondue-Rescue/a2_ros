@@ -173,3 +173,7 @@ source "$OSH"/oh-my-bash.sh
 # without requiring an image rebuild.
 [ -f /a2_ros/scripts/a2_shell.sh ] && source /a2_ros/scripts/a2_shell.sh
 
+# A2 full arming utils - USE ONLY IN SIM!
+
+alias a2_fullarm="a2 stand && a2 unlock && a2 walk"
+
