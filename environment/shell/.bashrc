@@ -176,4 +176,6 @@ source "$OSH"/oh-my-bash.sh
 # A2 full arming utils - USE ONLY IN SIM!
 
 alias a2_fullarm="a2 stand && a2 unlock && a2 walk"
-
+alias a2_simdetach="screen -dmS sim bash -c 'a2 source; a2 sim'"
+alias a2_navdetach="screen -dmS sim bash -c 'a2 source; a2 nav'"
+# alias a2_simnavfull="screen -dmS sim bash -c 'a2 source; a2 sim'; sleep 2s; a2 stand && a2 unlock && a2 walk; sleep 2s; screen -dmS sim bash -c 'a2 source; a2 nav'" Nonworking, dunno why
