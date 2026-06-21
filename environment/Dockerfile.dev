@@ -121,6 +121,11 @@ USER $USER
 ENV A2_MODE=sim
 ENV COLCON_DEFAULTS_FILE=/a2_ros/environment/colcon/sim.defaults.yaml
 
+USER root
+# ADD YOUR PACKAGES HERE
+RUN apt-get update && apt-get install -y screen
+USER $USER
+
 # Source ROS environment
 RUN echo "source ${PWD}/scripts/setup.sh" >> /home/$USER/.bashrc
 
