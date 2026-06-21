@@ -1,0 +1,4 @@
+target_accuracy: 0.5
+odom_topic: '/dlio/odom_node/map_pose'
+# odom_topic: '/odom'
+loop: False

@@ -4,18 +4,28 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import PointStamped
 from nav_msgs.msg import Odometry
+from ament_index_python.packages import get_package_share_directory
+import yaml
 
-class WaypointPlanner(Node):
+class WaypointExecutor(Node):
     def __init__(self):
-        super().__init__('WaypointPlanner')
+        super().__init__('WaypointExecutor')
 
-        # 1. Load Waypoints from file
-        self.waypoints = self.load_waypoints('waypoints.txt')
+        # Get Resources
+        package_share_dir = get_package_share_directory('fonduerescue')
+        configs_path = os.path.join(package_share_dir, 'configs')
+
+        # Get Config
+        with open(os.path.join(configs_path, "wp_exec.yaml"), 'r', encoding='utf-8') as file:
+            self.config = yaml.safe_load(file)
+
+        # Load Waypoints from file
+        self.waypoints = self.load_waypoints(os.path.join(configs_path, "waypoints.txt"))
         self.current_wp_idx = 0
         
-        # 2. State variables
+        # State variables
         self.current_position = None
-        self.target_accuracy = 0.5  # Distance threshold to waypoint
+        self.target_accuracy = self.config["target_accuracy"]  # Distance threshold to waypoint
 
         # Publishers & Subscribers
         # Restored to PointStamped as per your request
@@ -24,8 +34,7 @@ class WaypointPlanner(Node):
         # Odometry Subscriber
         self.odom_subscriber = self.create_subscription(
             Odometry,
-            # '/odom',
-            '/dlio/odom_node/map_pose',
+            self.config["odom_topic"],
             self.odom_callback,
             10
         )
@@ -37,24 +46,24 @@ class WaypointPlanner(Node):
     
     def load_waypoints(self, filename):
         """Loads x,y,z waypoints from a text file."""
-        waypoints = []
+        waypoints = [[0.0, 0.0, 0.0]]
         if not os.path.exists(filename):
-            self.get_logger().warn(f"File {filename} not found! Creating a dummy waypoint list.")
-            return np.array([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
-            
-        with open(filename, 'r') as f:
-            for line in f:
-                line = line.strip()
-                if not line or line.startswith('#'):
-                    continue
-                try:
-                    coords = [float(x) for x in line.split(',')]
-                    if len(coords) == 3:
-                        waypoints.append(coords)
-                except ValueError:
-                    self.get_logger().error(f"Could not parse line: {line}")
-                    
-        self.get_logger().info(f"Loaded {len(waypoints)} waypoints successfully.")
+            self.get_logger().warn(f"File {filename} not found!")
+        else:
+            with open(filename, 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or line.startswith('#'):
+                        continue
+                    try:
+                        coords = [float(x) for x in line.split(',')]
+                        if len(coords) == 3:
+                            waypoints.append(coords)
+                    except ValueError:
+                        self.get_logger().error(f"Could not parse line: {line}")        
+
+            self.get_logger().info(f"Loaded {len(waypoints)-1} waypoints successfully.")
+
         return np.array(waypoints)
 
     def odom_callback(self, msg):
@@ -78,6 +87,12 @@ class WaypointPlanner(Node):
             self.current_wp_idx += 1
             if self.current_wp_idx >= len(self.waypoints):
                 self.get_logger().info("All waypoints accomplished!")
+                if self.config["loop"]:
+                    self.current_wp_idx = 1
+                    self.get_logger().info("Restarting Loop...")
+                else:
+                    return
+            self.get_logger().info(f"Next waypoint {self.current_wp_idx}: {self.waypoints[self.current_wp_idx]}")
 
     def timer_callback(self):
         # If we have run out of waypoints, do nothing
@@ -102,7 +117,7 @@ class WaypointPlanner(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = WaypointPlanner()
+    node = WaypointExecutor()
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
