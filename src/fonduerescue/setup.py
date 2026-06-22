@@ -29,6 +29,7 @@ setup(
         'console_scripts': [
             'wp_exec_node = fonduerescue.wp_exec:main',
             'vel_cntrl_node = fonduerescue.velocity_control:main',
+            'system_monitor_node = fonduerescue.system_monitor:main',
         ],
     },
 )

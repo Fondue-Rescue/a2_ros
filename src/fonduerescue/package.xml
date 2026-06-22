@@ -7,6 +7,9 @@
   <maintainer email="wagnermo@student.ethz.ch">RSS Team 6</maintainer>
   <license>GPL</license>
 
+  <depend>rclpy</depend>
+  <depend>diagnostic_msgs</depend>
+
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_pep257</test_depend>
