@@ -81,13 +81,15 @@ class ObjectRegistration(Node):
     
     def timer_callback(self):
         # Publish markers for each label's centroids
+        i = 0
         for label, points in self.class_points.items():
             if len(points) == 0:
                 continue
             
             points_array = np.array([[p.x, p.y, p.z] for p in points])
             try:
-                clustering = DBSCAN(eps=0.4, min_samples=3).fit(points_array)
+                # ToDo: Class-specific DBSCAN parameters?
+                clustering = DBSCAN(eps=1.5, min_samples=3).fit(points_array)
                 unique_labels = set(clustering.labels_)
             except Exception as e:
                 self.get_logger().warn(f'Failed to perform DBSCAN clustering: {e}')
@@ -102,8 +104,9 @@ class ObjectRegistration(Node):
                 
             marker = Marker()
             marker.header.frame_id = "map"
+            marker.header.stamp = self.get_clock().now().to_msg()
             marker.ns = label
-            marker.id = cluster_label
+            marker.id = i
             marker.type = Marker.SPHERE_LIST
             marker.action = Marker.ADD
             marker.pose.orientation.w = 1.0
@@ -111,9 +114,9 @@ class ObjectRegistration(Node):
             marker.scale.y = 0.2
             marker.scale.z = 0.2
             marker.color.a = 1.0
-            marker.color.r = 1.0 if label == "umbrella" else 0
-            marker.color.g = 1.0 if label == "chair" else 0
-            marker.color.b = 1.0 if label == "table" else 0
+            marker.color.r = 1.0 if label == "umbrella" else 0.0
+            marker.color.g = 1.0 if label == "clock" else 0.0
+            marker.color.b = 1.0 if label == "suitcase" else 0.0
             for point in centroids:
                 po = Point()
                 po.x = point[0]
@@ -121,13 +124,40 @@ class ObjectRegistration(Node):
                 po.z = point[2]
                 marker.points.append(po)
             self.pub_marker.publish(marker)
+            i+=1
 
 def main(args=None):
-    rclpy.init(args=args)
-    node = ObjectRegistration()
-    rclpy.spin(node)
-    node.destroy_node()
-    rclpy.shutdown()
+    try:
+        rclpy.init(args=args)
+        node = ObjectRegistration()
+        rclpy.spin(node)
+        node.destroy_node()
+        rclpy.shutdown()
+    except Exception as e:
+        print(f"An error occurred in the main function: {e}")
+    finally:
+        # Save the detected points to a CSV file
+        with open(f'/a2_ros/bags/detected_objects_{rclpy.clock.Clock().now().nanoseconds}.csv', 'w', newline='') as csvfile:
+            fieldnames = ['label', 'x', 'y', 'z']
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            for label, points in node.class_points.items():
+                # Do DBSCAN clustering to get centroids
+                if len(points) == 0:
+                    continue
+                points_array = np.array([[p.x, p.y, p.z] for p in points])
+                try:
+                    clustering = DBSCAN(eps=1.5, min_samples=3).fit(points_array)
+                    unique_labels = set(clustering.labels_)
+                except Exception as e:
+                    print(f'Failed to perform DBSCAN clustering: {e}')
+                    continue
+                for cluster_label in unique_labels:
+                    if cluster_label == -1:
+                        continue  # Noise
+                    cluster_points = points_array[clustering.labels_ == cluster_label]
+                    centroid = np.mean(cluster_points, axis=0)
+                    writer.writerow({'label': label, 'x': centroid[0], 'y': centroid[1], 'z': centroid[2]})
 
 if __name__ == '__main__':
     main()
