@@ -65,7 +65,7 @@ def generate_launch_description():
                 'noDecayDis':          0.0,
                 'clearingDis':         8.0,
                 'useSorting':          True,
-                'quantileZ':           0.25, # Want quantile of points do we use to determine the Z height of a voxel?
+                'quantileZ':           0.50, # Want quantile of points do we use to determine the Z height of a voxel?
                 'considerDrop':        True,
                 'limitGroundLift':     True,
                 'maxGroundLift':       0.25,
@@ -134,7 +134,7 @@ def generate_launch_description():
                 'checkObstacle':       True,
                 'checkRotObstacle':    True,
                 'adjacentRange':       3.5,
-                'obstacleHeightThre':  0.25, # Lower Thresh for Obstacels, e.g. "we cant pass here"
+                'obstacleHeightThre':  0.17, # Lower Thresh for Obstacels, e.g. "we cant pass here"
                 'groundHeightThre':    0.1, # Lower Thresh to consider terrain for cost calculation
                 'costHeightThre':      0.1, # Up, so we have a Z region that does not add cost to the planner
                 'costScore':           0.02,
