@@ -60,12 +60,12 @@ def generate_launch_description():
             name='terrainAnalysis',
             output='screen',
             parameters=[{
-                'scanVoxelSize':       0.05,
-                'decayTime':           10.0,
+                'scanVoxelSize':       0.05, # Scan Voxel dimensionss
+                'decayTime':           10.0, # Obs Decay Time?
                 'noDecayDis':          0.0,
                 'clearingDis':         8.0,
                 'useSorting':          True,
-                'quantileZ':           0.25,
+                'quantileZ':           0.25, # Want quantile of points do we use to determine the Z height of a voxel?
                 'considerDrop':        True,
                 'limitGroundLift':     True,
                 'maxGroundLift':       0.25,
@@ -85,7 +85,7 @@ def generate_launch_description():
                 'voxelTimeUpdateThre': 2.0,
                 'minRelZ':             -1.0,
                 'maxRelZ':             1.0,
-                'disRatioZ':           0.2,
+                'disRatioZ':           0.2, # Acceptable Distance Ratio 
             }],
         ),
 
@@ -134,11 +134,11 @@ def generate_launch_description():
                 'checkObstacle':       True,
                 'checkRotObstacle':    True,
                 'adjacentRange':       3.5,
-                'obstacleHeightThre':  0.25,
-                'groundHeightThre':    0.1,
-                'costHeightThre':      0.1,
+                'obstacleHeightThre':  0.25, # Lower Thresh for Obstacels, e.g. "we cant pass here"
+                'groundHeightThre':    0.1, # Lower Thresh to consider terrain for cost calculation
+                'costHeightThre':      0.1, # Up, so we have a Z region that does not add cost to the planner
                 'costScore':           0.02,
-                'useCost':             False,
+                'useCost':             False, # Use Cost
                 'pointPerPathThre':    2,
                 'minRelZ':             -0.5,
                 'maxRelZ':             0.8,
