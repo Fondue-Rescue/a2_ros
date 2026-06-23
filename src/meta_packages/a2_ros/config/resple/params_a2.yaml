@@ -1,7 +1,7 @@
 /**:
   ros__parameters:
     topic_imu: /front_lidar/imu
-    lidars: ["front_hesai"]
+    lidars: ["front_hesai", "back_hesai"]
     front_hesai:
       topic_lidar: /front_lidar/points
       lidar_type: Hesai
@@ -15,11 +15,11 @@
       lidar_type: Hesai
       scan_line: 128
       blind: 0.5
-      q_lb: [1.0, 0.0, 0.0, 0.0]
-      t_lb: [0.0, 0.0, 0.0]
+      q_lb: [0.0, 0.0307915, -0.9995258, 0.0] # rear_lidar_link->front_lidar_link when using /front_lidar/imu
+      t_lb: [0.0, -0.006, -0.618]
       w_pt: 0.01
     lidar_time_offset: 0.0
-    pcd_save_path: "/tmp/global_map.pcd"
+    pcd_save_path: "/a2_ros/bags/global_map.pcd"
 
     knot_hz: 100
     if_lidar_only: false
