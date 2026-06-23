@@ -72,10 +72,10 @@ tare_planner_node:
     # ViewPointManager — grid of candidate sensor poses for coverage planning
     viewpoint_manager/number_x : 10    # viewpoint grid cells in X
     viewpoint_manager/number_y : 10    # viewpoint grid cells in Y
-    viewpoint_manager/number_z : 1     # viewpoint grid cells in Z (1 = 2-D planning)
+    viewpoint_manager/number_z : 10     # viewpoint grid cells in Z (1 = 2-D planning)
     viewpoint_manager/resolution_x : 0.8  # viewpoint cell size X (m)
     viewpoint_manager/resolution_y : 0.8  # viewpoint cell size Y (m)
-    viewpoint_manager/resolution_z : 0.0  # viewpoint cell size Z (m)
+    viewpoint_manager/resolution_z : 0.8  # viewpoint cell size Z (m)
     kConnectivityHeightDiffThr : 0.25     # max height difference for two viewpoints to be connected (m)
     kGreedyViewPointSampleRange : 3       # candidates sampled per greedy selection step
     kLocalPathOptimizationItrMax : 10     # TSP optimization iterations for local path ordering
@@ -85,7 +85,7 @@ tare_planner_node:
     kCollisionGridZScale : 1.0            # Z scale factor applied to collision grid
     kCollisionGridResolutionX : 0.2       # collision grid cell size X (m)
     kCollisionGridResolutionY : 0.2       # collision grid cell size Y (m)
-    kCollisionGridResolutionZ : 0.0       # collision grid cell size Z (m)
+    kCollisionGridResolutionZ : 0.2       # collision grid cell size Z (m)
     kCollisionPointThr : 1                # min collision points in a cell to mark viewpoint in collision
     kLineOfSightStopAtNearestObstacle : true          # stop line-of-sight ray at first hit rather than end point
     kViewPointHeightFromTerrain : 0.5                 # viewpoint height above terrain — matches A2 sensor height (m)
@@ -101,7 +101,7 @@ tare_planner_node:
     # Grid World — coarse global map tracking exploration state per cell
     kGridWorldXNum : 121          # global grid cells in X (total X = XNum * CellHeight)
     kGridWorldYNum : 121          # global grid cells in Y
-    kGridWorldZNum : 1            # global grid cells in Z (1 = flat/ground-level only)
+    kGridWorldZNum : 12           # global grid cells in Z (1 = flat/ground-level only)
     kGridWorldCellHeight : 1.5    # size of each global grid cell (m)
     kGridWorldNearbyGridNum : 5   # nearby cells considered for local search
     kMinAddPointNumSmall : 20     # min new coverage points for a minor coverage increment
