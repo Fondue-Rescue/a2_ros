@@ -30,8 +30,8 @@ tare_planner_node:
     kAtHomeDistThreshold : 0.5      # distance to consider robot arrived at home (m)
     kTerrainCollisionThreshold : 0.3     # terrain point intensity above this is treated as a collision obstacle
     kLookAheadDistance : 5.0        # distance ahead on path to project lookahead waypoint (m)
-    kUseMomentum : false            # bias waypoint selection toward previous travel direction
-    kDirectionChangeCounterThr : 6       # consecutive direction changes before momentum switch triggers
+    kUseMomentum : true            # bias waypoint selection toward previous travel direction
+    kDirectionChangeCounterThr : 3       # consecutive direction changes before momentum switch triggers
     kDirectionNoChangeCounterThr : 5     # steps without direction change before stuck detection triggers
     kResetWaypointJoystickAxesID : 2     # joystick axis index that manually resets the waypoint
 
@@ -96,7 +96,7 @@ tare_planner_node:
     kSensorRange : 10.0          # max range used for coverage calculations — matches lidar cutoff (m)
     kNeighborRange : 2.5         # search radius for viewpoint connectivity (m)
     kCoverageOcclusionThr : 0.3  # distance threshold for occlusion in coverage calculation (m)
-    kCoverageDilationRadius : 0.8  # dilation radius applied to covered area (m)
+    kCoverageDilationRadius : 0.4  # dilation radius applied to covered area (m)
 
     # Grid World — coarse global map tracking exploration state per cell
     kGridWorldXNum : 121          # global grid cells in X (total X = XNum * CellHeight)
@@ -106,7 +106,7 @@ tare_planner_node:
     kGridWorldNearbyGridNum : 5   # nearby cells considered for local search
     kMinAddPointNumSmall : 20     # min new coverage points for a minor coverage increment
     kMinAddPointNumBig : 40       # min new coverage points for a significant coverage increment
-    kMinAddFrontierPointNum : 10  # min points for a frontier cell to remain active
+    kMinAddFrontierPointNum : 5  # min points for a frontier cell to remain active
     kCellExploringToCoveredThr : 1    # coverage count to transition cell: exploring → covered
     kCellCoveredToExploringThr : 10   # coverage count drop to revert cell: covered → exploring
     kCellExploringToAlmostCoveredThr : 10   # coverage count for exploring → almost-covered
