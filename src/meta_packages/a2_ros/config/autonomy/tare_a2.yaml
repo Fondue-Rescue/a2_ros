@@ -17,16 +17,16 @@ tare_planner_node:
     pub_momentum_activation_count_topic_ : momentum_activation_count
 
     kAutoStart : true               # start exploring immediately without external trigger
-    kRushHome : false               # return to start when near home after exploration finishes
+    kRushHome : true               # return to start when near home after exploration finishes
     kUseTerrainHeight : true        # use terrain map height for terrain-aware planning
     kCheckTerrainCollision : true   # reject terrain points above kTerrainCollisionThreshold as obstacles
     kExtendWayPoint : true          # extend lookahead waypoint further if it is within extend distance
     kUseLineOfSightLookAheadPoint : true  # require line-of-sight to lookahead point; pick alternative if blocked
-    kNoExplorationReturnHome : false      # return to start when exploration is complete
+    kNoExplorationReturnHome : true      # return to start when exploration is complete
     kExtendWayPointDistanceBig : 4.0     # extension distance when waypoint has line-of-sight (m)
     kExtendWayPointDistanceSmall : 2.5   # extension distance when waypoint does not have line-of-sight (m)
     kKeyposeCloudDwzFilterLeafSize : 0.2 # voxel leaf size for downsampling keypose / registered scan clouds (m)
-    kRushHomeDist : 10.0            # distance to home below which rush-home activates (m)
+    kRushHomeDist : 1000.0            # distance to home below which rush-home activates (m)
     kAtHomeDistThreshold : 0.5      # distance to consider robot arrived at home (m)
     kTerrainCollisionThreshold : 0.3     # terrain point intensity above this is treated as a collision obstacle
     kLookAheadDistance : 5.0        # distance ahead on path to project lookahead waypoint (m)
