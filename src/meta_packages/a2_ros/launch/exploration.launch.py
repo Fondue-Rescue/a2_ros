@@ -42,6 +42,7 @@ def generate_launch_description():
     a2_ros_dir      = get_package_share_directory('a2_ros')
     rviz_path        = os.path.join(a2_ros_dir, 'rviz', 'exploration.rviz')
     tare_config      = os.path.join(a2_ros_dir, 'config', 'autonomy', 'tare_a2.yaml')
+    far_config      = os.path.join(a2_ros_dir, 'config', 'autonomy', 'far_a2.yaml')
 
     rviz_arg = DeclareLaunchArgument(
         'rviz',
@@ -208,6 +209,29 @@ def generate_launch_description():
             name='tare_planner_node',
             output='screen',
             parameters=[tare_config],
+            remappings=[
+                ('/way_point', '/goal_point'),
+            ]
+        ),
+
+        # -- FAR
+        Node(
+            package='far_planner',
+            executable='far_planner',
+            name='far_planner',
+            output='screen',
+            # Run headless: no X display in container/SSH, so force Qt offscreen
+            # to avoid the xcb plugin aborting (SIGABRT). Planning still works;
+            # use RViz instead of the FAR Planner GUI for visualization.
+            additional_env={'QT_QPA_PLATFORM': 'offscreen'},
+            parameters=[far_config],
+            remappings=[
+                ('/odom_world',         '/state_estimation'),
+                ('/terrain_cloud',      '/terrain_map_ext'),
+                ('/scan_cloud',         '/registered_scan'),
+                ('/terrain_local_cloud','/terrain_map'),
+                ('/navigation_boundary', '/dontuse'),
+            ],
         ),
 
 
