@@ -6,7 +6,9 @@ Starts the full exploration stack on top of the running sim:
   - terrain_analysis_ext : builds /terrain_map_ext (global terrain)
   - local_planner        : obstacle-aware path selection
   - pathFollower         : converts waypoints to velocity, /nav_vel (twist_mux input)
-  - tare_planner         : autonomous coverage exploration (replaces far_planner)
+  - tare_planner         : autonomous coverage exploration
+  - far_planner          : builds visibility graph in background, navigates home after exploration
+  - exploration_relay    : hands off waypoints from TARE to FAR when exploration finishes
 
 Prerequisites (provided by sim.launch.py + a2_bridge):
   /state_estimation  - ground-truth odometry (published by a2_bridge in a2_sim_utils)
@@ -42,6 +44,7 @@ def generate_launch_description():
     a2_ros_dir      = get_package_share_directory('a2_ros')
     rviz_path        = os.path.join(a2_ros_dir, 'rviz', 'exploration.rviz')
     tare_config      = os.path.join(a2_ros_dir, 'config', 'autonomy', 'tare_a2.yaml')
+    far_config       = os.path.join(a2_ros_dir, 'config', 'autonomy', 'far_a2.yaml')
 
     rviz_arg = DeclareLaunchArgument(
         'rviz',
@@ -202,6 +205,7 @@ def generate_launch_description():
         ),
 
         # ---- TARE planner (autonomous exploration) ----
+        # Publishes waypoints on /tare_way_point (relayed to /way_point by exploration_relay)
         Node(
             package='tare_planner',
             executable='tare_planner_node',
@@ -210,6 +214,34 @@ def generate_launch_description():
             parameters=[tare_config],
         ),
 
+        # ---- FAR planner (visibility-graph, builds in background) ----
+        # Subscribes to /goal_point, publishes on /way_point when given a goal.
+        # During exploration it has no goal so it only builds the V-graph.
+        # After exploration, exploration_relay sends the home goal.
+        Node(
+            package='far_planner',
+            executable='far_planner',
+            name='far_planner',
+            output='screen',
+            additional_env={'QT_QPA_PLATFORM': 'offscreen'},
+            parameters=[far_config],
+            remappings=[
+                ('/odom_world',          '/state_estimation'),
+                ('/terrain_cloud',       '/terrain_map_ext'),
+                ('/scan_cloud',          '/registered_scan'),
+                ('/terrain_local_cloud', '/terrain_map'),
+            ],
+        ),
+
+        # ---- exploration relay (TARE → FAR handoff) ----
+        # Forwards /tare_way_point → /way_point during exploration.
+        # When exploration_finish=true, sends home goal to FAR via /goal_point.
+        Node(
+            package='a2_ros',
+            executable='exploration_relay',
+            name='exploration_relay',
+            output='screen',
+        ),
 
         # ---- RViz ----
         Node(

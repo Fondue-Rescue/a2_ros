@@ -68,11 +68,22 @@ ament_target_dependencies(scan_pose_sync
   geometry_msgs
 )
 
+add_executable(exploration_relay
+  src/exploration_relay.cpp
+)
+ament_target_dependencies(exploration_relay
+  rclcpp
+  geometry_msgs
+  nav_msgs
+  std_msgs
+)
+
 install(TARGETS
   stand_example
   teleop_joy
   nav_vel_relay
   scan_pose_sync
+  exploration_relay
   DESTINATION lib/${PROJECT_NAME}
 )
 
