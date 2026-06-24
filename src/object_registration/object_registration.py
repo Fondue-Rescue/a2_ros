@@ -21,6 +21,32 @@ class ObjectRegistration(Node):
         self.odom = None
         self.class_points = {} # key: label name, data: list of detection points belonging to that label
 
+        self.target_labels = ["backpack", "umbrella", "stop sign", "clock", "bottle"]
+
+        self.target_colors_rgb = {
+            "backpack": (1.0, 0, 0),  # Red
+            "umbrella": (0, 1.0, 0),  # Green
+            "stop sign": (0, 0, 1.0),  # Blue
+            "clock": (1.0, 1.0, 0),    # Yellow
+            "bottle": (1.0, 0.65, 0),   # Orange
+        }
+
+        self.target_eps = {
+            "backpack": 1.5,
+            "umbrella": 3.0,
+            "stop sign": 1.5,
+            "clock": 1.5,
+            "bottle": 1.5,
+        }
+
+        self.target_min_samples = {
+            "backpack": 3,
+            "umbrella": 3,
+            "stop sign": 3,
+            "clock": 3,
+            "bottle": 3,
+        }
+
         # Publishers
         ## Marker to put at (supposed) position of umbrella
         self.pub_marker = self.create_publisher(
@@ -90,13 +116,14 @@ class ObjectRegistration(Node):
         # Publish markers for each label's centroids
         i = 0
         for label, points in self.class_points.items():
+            if label not in self.target_labels:
+                continue  # Skip labels that are not in the target list
             if len(points) == 0:
                 continue
             
             points_array = np.array([[p.x, p.y, p.z] for p in points])
             try:
-                # ToDo: Class-specific DBSCAN parameters?
-                clustering = DBSCAN(eps=1.5, min_samples=3).fit(points_array)
+                clustering = DBSCAN(eps=self.target_eps.get(label, 1.5), min_samples=self.target_min_samples.get(label, 3)).fit(points_array)
                 unique_labels = set(clustering.labels_)
             except Exception as e:
                 self.get_logger().warn(f'Failed to perform DBSCAN clustering: {e}')
@@ -121,9 +148,9 @@ class ObjectRegistration(Node):
             marker.scale.y = 0.2
             marker.scale.z = 0.2
             marker.color.a = 1.0
-            marker.color.r = 1.0 if label == "umbrella" else 0.0
-            marker.color.g = 1.0 if label == "clock" else 0.0
-            marker.color.b = 1.0 if label == "suitcase" else 0.0
+            marker.color.r = self.target_colors_rgb.get(label, (0, 0, 0))[0]
+            marker.color.g = self.target_colors_rgb.get(label, (0, 0, 0))[1]
+            marker.color.b = self.target_colors_rgb.get(label, (0, 0, 0))[2]
             for point in centroids:
                 po = Point()
                 po.x = point[0]
@@ -149,12 +176,14 @@ def main(args=None):
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
             for label, points in node.class_points.items():
+                if label not in node.target_labels:
+                    continue  # Skip labels that are not in the target list
                 # Do DBSCAN clustering to get centroids
                 if len(points) == 0:
                     continue
                 points_array = np.array([[p.x, p.y, p.z] for p in points])
                 try:
-                    clustering = DBSCAN(eps=1.5, min_samples=3).fit(points_array)
+                    clustering = DBSCAN(eps=node.target_eps.get(label, 1.5), min_samples=node.target_min_samples.get(label, 3)).fit(points_array)
                     unique_labels = set(clustering.labels_)
                 except Exception as e:
                     print(f'Failed to perform DBSCAN clustering: {e}')
