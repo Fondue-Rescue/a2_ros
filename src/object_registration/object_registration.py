@@ -24,11 +24,11 @@ class ObjectRegistration(Node):
         self.target_labels = ["backpack", "umbrella", "stop sign", "clock", "bottle"]
 
         self.target_colors_rgb = {
-            "backpack": (1.0, 0, 0),  # Red
-            "umbrella": (0, 1.0, 0),  # Green
-            "stop sign": (0, 0, 1.0),  # Blue
-            "clock": (1.0, 1.0, 0),    # Yellow
-            "bottle": (1.0, 0.65, 0),   # Orange
+            "backpack": (1.0, 0.0, 0.0),  # Red
+            "umbrella": (0.0, 1.0, 0.0),  # Green
+            "stop sign": (0.0, 0.0, 1.0),  # Blue
+            "clock": (1.0, 1.0, 0.0),    # Yellow
+            "bottle": (1.0, 0.65, 0.0),   # Orange
         }
 
         self.target_eps = {
