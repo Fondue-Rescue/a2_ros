@@ -70,18 +70,18 @@ def generate_launch_description():
                 'noDecayDis':          0.0,
                 'clearingDis':         8.0,
                 'useSorting':          True,
-                'quantileZ':           0.25,
+                'quantileZ':           0.25, # From what quantile of the sorted voxel point list to we want to take our height "PlanarPointElev"
                 'considerDrop':        True,
-                'limitGroundLift':     True,
-                'maxGroundLift':       0.25,
-                'clearDyObs':          False,
-                'minDyObsDis':         0.3,
-                'minDyObsAngle':       0.0,
-                'minDyObsRelZ':        -0.5,
-                'absDyObsRelZThre':    0.2,
-                'minDyObsVFOV':        -16.0,
-                'maxDyObsVFOV':        16.0,
-                'minDyObsPointNum':    1,
+                'limitGroundLift':     True, # make ground glat
+                'maxGroundLift':       0.25, # makes ground flat if it rises over this thr
+                'clearDyObs':          False,# Dynamic Obstacle Handling
+                'minDyObsDis':         0.3,  # unused if cleardyobs isnt used
+                'minDyObsAngle':       0.0,  # unused if cleardyobs isnt used
+                'minDyObsRelZ':        -0.5, # unused if cleardyobs isnt used
+                'absDyObsRelZThre':    0.2,  # unused if cleardyobs isnt used
+                'minDyObsVFOV':        -16.0,# unused if cleardyobs isnt used
+                'maxDyObsVFOV':        16.0, # unused if cleardyobs isnt used
+                'minDyObsPointNum':    1,    # unused if cleardyobs isnt used
                 'noDataObstacle':      False,
                 'noDataBlockSkipNum':  0,
                 'minBlockPointNum':    10,
@@ -90,7 +90,7 @@ def generate_launch_description():
                 'voxelTimeUpdateThre': 2.0,
                 'minRelZ':             -1.0,
                 'maxRelZ':             1.0,
-                'disRatioZ':           0.2,
+                'disRatioZ':           0.2, # Make the "cone" of acceptable points larger with distance
             }],
         ),
 
@@ -135,16 +135,16 @@ def generate_launch_description():
                 'sensorOffsetY':       0.0,
                 'twoWayDrive':         False,
                 'laserVoxelSize':      0.05,
-                'terrainVoxelSize':    0.2,
+                'terrainVoxelSize':    0.2,    # IMP
                 'useTerrainAnalysis':  True,
                 'checkObstacle':       True,
                 'checkRotObstacle':    True,
-                'adjacentRange':       3.5,
+                'adjacentRange':       3.5,    # For far around the robot around do we analyze
                 'obstacleHeightThre':  0.17,
-                'groundHeightThre':    0.1,
-                'costHeightThre':      0.1,
-                'costScore':           0.02,
-                'useCost':             False,
+                'groundHeightThre':    0.1,    # Unused if no cost
+                'costHeightThre':      0.1,    # Unused if no cost
+                'costScore':           0.02,   # Unused if no cost
+                'useCost':             False,  # Use cost-based planner
                 'pointPerPathThre':    2,
                 'minRelZ':             -0.5,
                 'maxRelZ':             0.8,
@@ -164,7 +164,7 @@ def generate_launch_description():
                 'autonomySpeed':       2.0,
                 'joyToSpeedDelay':     2.0,
                 'joyToCheckObstacleDelay': 5.0,
-                'goalClearRange':      0.4,
+                'goalClearRange':      0.4,    # Goal Reached Range????
                 'goalX':               0.0,
                 'goalY':               0.0,
             }],
