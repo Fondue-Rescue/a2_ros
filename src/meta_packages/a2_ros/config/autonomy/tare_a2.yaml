@@ -70,8 +70,8 @@ tare_planner_node:
     keypose_graph/kAddEdgeCollisionCheckPointNumThr : 1   # collision points needed to reject an edge
 
     # ViewPointManager — grid of candidate sensor poses for coverage planning
-    viewpoint_manager/number_x : 10    # viewpoint grid cells in X
-    viewpoint_manager/number_y : 10    # viewpoint grid cells in Y
+    viewpoint_manager/number_x : 50    # viewpoint grid cells in X
+    viewpoint_manager/number_y : 50    # viewpoint grid cells in Y
     viewpoint_manager/number_z : 1     # viewpoint grid cells in Z (1 = 2-D planning)
     viewpoint_manager/resolution_x : 0.8  # viewpoint cell size X (m)
     viewpoint_manager/resolution_y : 0.8  # viewpoint cell size Y (m)
