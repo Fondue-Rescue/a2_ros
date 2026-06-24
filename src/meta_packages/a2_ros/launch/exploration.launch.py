@@ -61,7 +61,7 @@ def generate_launch_description():
             package='terrain_analysis',
             executable='terrainAnalysis',
             name='terrainAnalysis',
-            output='screen',
+            output='log',
             parameters=[{
                 'scanVoxelSize':       0.05,
                 'decayTime':           10.0,
@@ -97,7 +97,7 @@ def generate_launch_description():
             package='terrain_analysis_ext',
             executable='terrainAnalysisExt',
             name='terrainAnalysisExt',
-            output='screen',
+            output='log',
             parameters=[{
                 'scanVoxelSize':        0.1,
                 'decayTime':            10.0,
@@ -123,7 +123,7 @@ def generate_launch_description():
             package='local_planner',
             executable='localPlanner',
             name='localPlanner',
-            output='screen',
+            output='log',
             parameters=[{
                 'pathFolder':          get_package_share_directory('local_planner') + '/paths',
                 'vehicleLength':       0.65,
@@ -145,7 +145,7 @@ def generate_launch_description():
                 'pointPerPathThre':    2,
                 'minRelZ':             -0.5,
                 'maxRelZ':             0.8,
-                'maxSpeed':            0.5,
+                'maxSpeed':            1.5,
                 'dirWeight':           0.1,
                 'dirThre':             135.0,
                 'dirToVehicle':        False,
@@ -171,7 +171,7 @@ def generate_launch_description():
             package='local_planner',
             executable='pathFollower',
             name='pathFollower',
-            output='screen',
+            output='log',
             parameters=[{
                 'sensorOffsetX':    0.0,
                 'sensorOffsetY':    0.0,
@@ -181,7 +181,7 @@ def generate_launch_description():
                 'yawRateGain':      10.0,
                 'stopYawRateGain':  8.0,
                 'maxYawRate':       45.0,
-                'maxSpeed':         0.5,
+                'maxSpeed':         1.5,
                 'maxAccel':         2.0,
                 'switchTimeThre':   1.0,
                 'dirDiffThre':      0.3,
@@ -210,7 +210,7 @@ def generate_launch_description():
             package='tare_planner',
             executable='tare_planner_node',
             name='tare_planner_node',
-            output='screen',
+            output='log',
             parameters=[tare_config],
         ),
 
