@@ -65,7 +65,7 @@ def generate_launch_description():
                 'noDecayDis':          0.0,
                 'clearingDis':         8.0,
                 'useSorting':          True,
-                'quantileZ':           0.25,
+                'quantileZ':           0.3,
                 'considerDrop':        True,
                 'limitGroundLift':     True,
                 'maxGroundLift':       0.25,
@@ -97,7 +97,7 @@ def generate_launch_description():
             output='screen',
             parameters=[{
                 'scanVoxelSize':        0.1,
-                'decayTime':            10.0,
+                'decayTime':            45.0,
                 'noDecayDis':           0.0,
                 'clearingDis':          30.0,
                 'useSorting':           True,
