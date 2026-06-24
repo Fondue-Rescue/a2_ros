@@ -129,7 +129,7 @@ def generate_launch_description():
                 'sensorOffsetY':       0.0,
                 'twoWayDrive':         False,
                 'laserVoxelSize':      0.05,
-                'terrainVoxelSize':    0.2,
+                'terrainVoxelSize':    0.05,
                 'useTerrainAnalysis':  True,
                 'checkObstacle':       True,
                 'checkRotObstacle':    True,
