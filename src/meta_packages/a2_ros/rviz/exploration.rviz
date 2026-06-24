@@ -9,7 +9,7 @@ Panels:
         - /TARE Global1
         - /TARE Local1
       Splitter Ratio: 0.41999998688697815
-    Tree Height: 425
+    Tree Height: 591
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -134,6 +134,18 @@ Visualization Manager:
               Show Axes: false
               Show Trail: false
               Value: true
+            camera_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            front_camera_optical_frame:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
+            front_lidar_imu_link:
+              Alpha: 1
+              Show Axes: false
+              Show Trail: false
             front_lidar_link:
               Alpha: 1
               Show Axes: false
@@ -415,7 +427,7 @@ Visualization Manager:
           Enabled: true
           Name: ExploringSubspaces
           Namespaces:
-            {}
+            "": true
           Topic:
             Depth: 5
             Durability Policy: Volatile
@@ -471,7 +483,7 @@ Visualization Manager:
           Min Color: 0; 0; 0
           Min Intensity: 0
           Name: UncoveredSurfaces
-          Position Transformer: ""
+          Position Transformer: XYZ
           Selectable: true
           Size (Pixels): 2
           Size (m): 0.20000000298023224
@@ -504,7 +516,7 @@ Visualization Manager:
           Min Color: 0; 0; 0
           Min Intensity: 0
           Name: UncoveredFrontiers
-          Position Transformer: ""
+          Position Transformer: XYZ
           Selectable: true
           Size (Pixels): 2
           Size (m): 0.30000001192092896
@@ -572,7 +584,7 @@ Visualization Manager:
           Enabled: true
           Name: LocalPlanningHorizon
           Namespaces:
-            {}
+            "": true
           Topic:
             Depth: 5
             Durability Policy: Volatile
@@ -600,7 +612,7 @@ Visualization Manager:
           Min Color: 0; 0; 0
           Min Intensity: 0
           Name: SelectedViewpoints
-          Position Transformer: ""
+          Position Transformer: XYZ
           Selectable: true
           Size (Pixels): 3
           Size (m): 1
@@ -626,14 +638,14 @@ Visualization Manager:
           Color: 237; 212; 0
           Color Transformer: FlatColor
           Decay Time: 0
-          Enabled: false
+          Enabled: true
           Invert Rainbow: false
           Max Color: 255; 255; 255
           Max Intensity: 100
           Min Color: 0; 0; 0
           Min Intensity: -1
           Name: ViewpointCandidates
-          Position Transformer: ""
+          Position Transformer: XYZ
           Selectable: true
           Size (Pixels): 3
           Size (m): 0.5
@@ -646,7 +658,7 @@ Visualization Manager:
             Value: /viewpoint_vis_cloud
           Use Fixed Frame: true
           Use rainbow: true
-          Value: false
+          Value: true
         - Alpha: 1
           Class: rviz_default_plugins/PointStamped
           Color: 204; 41; 204
@@ -702,10 +714,10 @@ Visualization Manager:
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 900
+  Height: 1540
   Hide Left Dock: false
   Hide Right Dock: true
-  QMainWindow State: 000000ff00000000fd00000001000000000000030200000326fc0200000005fb000000100044006900730070006c006100790073010000003f000001e9000000cc00fffffffb0000001200530065006c0065006300740069006f006e00000001b40000005d0000005d00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007300000001e90000006a0000005d00fffffffb0000000a00560069006500770073010000022e000000e1000000a900fffffffb0000000800540069006d00650100000315000000500000003c00ffffff000003380000032600000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd00000001000000000000046000000572fc0200000005fb000000100044006900730070006c0061007900730100000069000002b30000017800fffffffb0000001200530065006c0065006300740069006f006e00000001b40000005d000000ab00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007300000001e90000006a000000ab00fffffffb0000000a005600690065007700730100000328000002120000012300fffffffb0000000800540069006d00650100000546000000950000005100ffffff000004a10000057200000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -714,6 +726,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: false
-  Width: 1600
-  X: 0
-  Y: 161
+  Width: 2317
+  X: 414
+  Y: 90
