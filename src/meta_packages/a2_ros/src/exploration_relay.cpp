@@ -3,15 +3,6 @@
 #include "nav_msgs/msg/odometry.hpp"
 #include "std_msgs/msg/bool.hpp"
 
-// Waypoint relay that hands off from TARE to FAR planner.
-//
-// During exploration:
-//   /tare_way_point (from TARE) → /way_point (to local_planner)
-//
-// When TARE publishes exploration_finish=true:
-//   - Stops relaying TARE waypoints
-//   - Publishes initial robot position to /goal_point (for FAR)
-//   - FAR then takes over /way_point directly
 class ExplorationRelay : public rclcpp::Node {
 public:
   ExplorationRelay() : Node("exploration_relay") {
@@ -33,6 +24,11 @@ public:
     finish_sub_ = create_subscription<std_msgs::msg::Bool>(
         "/exploration_finish", 2,
         std::bind(&ExplorationRelay::finishCb, this, std::placeholders::_1));
+
+    reach_goal_sub_ = create_subscription<std_msgs::msg::Bool>(
+        "/far_reach_goal_status", 5,
+        std::bind(&ExplorationRelay::reachGoalCb, this,
+                  std::placeholders::_1));
   }
 
 private:
@@ -55,7 +51,7 @@ private:
     if (msg->data && !exploration_finished_) {
       exploration_finished_ = true;
       RCLCPP_INFO(get_logger(),
-                  "Exploration finished — sending home goal to FAR planner");
+                  "===== EXPLORATION FINISHED — returning home via FAR planner =====");
 
       if (have_initial_pos_) {
         geometry_msgs::msg::PointStamped goal;
@@ -70,16 +66,26 @@ private:
     }
   }
 
+  void reachGoalCb(const std_msgs::msg::Bool::SharedPtr msg) {
+    if (msg->data && exploration_finished_ && !home_reached_) {
+      home_reached_ = true;
+      RCLCPP_INFO(get_logger(),
+                  "===== HOME REACHED — robot has returned to start position =====");
+    }
+  }
+
   rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr waypoint_pub_;
   rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr goal_pub_;
   rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr
       tare_waypoint_sub_;
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub_;
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr finish_sub_;
+  rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr reach_goal_sub_;
 
   geometry_msgs::msg::Point initial_pos_;
   bool have_initial_pos_ = false;
   bool exploration_finished_ = false;
+  bool home_reached_ = false;
 };
 
 int main(int argc, char *argv[]) {
