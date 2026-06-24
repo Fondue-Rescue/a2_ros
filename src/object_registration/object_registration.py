@@ -67,14 +67,21 @@ class ObjectRegistration(Node):
             # Store the label if not already stored
             if label not in self.class_points.keys():
                 self.class_points[label] = []
-            # Convert position to map frame
+            # Get latest transfrom between front_camera_optical_frame and map
+            try:
+                transform = self.tf_buffer.lookup_transform("map", "front_camera_optical_frame", rclpy.time.Time())
+            except Exception as e:
+                self.get_logger().warn(f'Failed to lookup transform: {e}')
+                continue
+
+            # Convert position to map frame using obtained tf
             point = PointStamped()
             point.header.frame_id = "front_camera_optical_frame"
             point.header.stamp = msg.header.stamp
             point.point = detection.position
             try:
-                point_map = self.tf_buffer.transform(point, "map")
-                self.class_points[label].append(point_map.point)            
+                point_map = do_transform_point(point, transform)
+                self.class_points[label].append(point_map.point)
             except Exception as e:
                 self.get_logger().warn(f'Failed to transform point: {e}')
                 continue
