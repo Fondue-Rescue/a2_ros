@@ -54,11 +54,10 @@ private:
                   "===== EXPLORATION FINISHED — returning home via FAR planner =====");
 
       if (have_initial_pos_) {
-        geometry_msgs::msg::PointStamped goal;
-        goal.header.frame_id = "map";
-        goal.header.stamp = now();
-        goal.point = initial_pos_;
-        goal_pub_->publish(goal);
+        publishHomeGoal();
+        goal_timer_ = create_wall_timer(
+            std::chrono::seconds(1),
+            std::bind(&ExplorationRelay::publishHomeGoal, this));
       } else {
         RCLCPP_ERROR(get_logger(),
                      "No initial position recorded, cannot send home goal");
@@ -66,9 +65,20 @@ private:
     }
   }
 
+  void publishHomeGoal() {
+    geometry_msgs::msg::PointStamped goal;
+    goal.header.frame_id = "map";
+    goal.header.stamp = now();
+    goal.point = initial_pos_;
+    goal_pub_->publish(goal);
+  }
+
   void reachGoalCb(const std_msgs::msg::Bool::SharedPtr msg) {
     if (msg->data && exploration_finished_ && !home_reached_) {
       home_reached_ = true;
+      if (goal_timer_) {
+        goal_timer_->cancel();
+      }
       RCLCPP_INFO(get_logger(),
                   "===== HOME REACHED — robot has returned to start position =====");
     }
@@ -82,6 +92,7 @@ private:
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr finish_sub_;
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr reach_goal_sub_;
 
+  rclcpp::TimerBase::SharedPtr goal_timer_;
   geometry_msgs::msg::Point initial_pos_;
   bool have_initial_pos_ = false;
   bool exploration_finished_ = false;
