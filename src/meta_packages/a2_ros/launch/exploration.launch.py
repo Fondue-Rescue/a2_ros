@@ -143,7 +143,7 @@ def generate_launch_description():
                 'pointPerPathThre':    2,
                 'minRelZ':             -0.5,
                 'maxRelZ':             0.8,
-                'maxSpeed':            0.5,
+                'maxSpeed':            0.2,
                 'dirWeight':           0.1,
                 'dirThre':             135.0,
                 'dirToVehicle':        False,
@@ -179,7 +179,7 @@ def generate_launch_description():
                 'yawRateGain':      10.0,
                 'stopYawRateGain':  8.0,
                 'maxYawRate':       45.0,
-                'maxSpeed':         0.5,
+                'maxSpeed':         0.2,
                 'maxAccel':         2.0,
                 'switchTimeThre':   1.0,
                 'dirDiffThre':      0.3,
@@ -209,9 +209,6 @@ def generate_launch_description():
             name='tare_planner_node',
             output='screen',
             parameters=[tare_config],
-            remappings=[
-                ('/way_point', '/goal_point'),
-            ]
         ),
 
         # -- FAR
@@ -219,7 +216,8 @@ def generate_launch_description():
             package='far_planner',
             executable='far_planner',
             name='far_planner',
-            output='screen',
+            # output='screen',
+            output='log',
             # Run headless: no X display in container/SSH, so force Qt offscreen
             # to avoid the xcb plugin aborting (SIGABRT). Planning still works;
             # use RViz instead of the FAR Planner GUI for visualization.
