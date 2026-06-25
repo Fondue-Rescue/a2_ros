@@ -92,6 +92,9 @@ def generate_launch_description():
                 'maxRelZ':             1.0,
                 'disRatioZ':           0.2, # Make the "cone" of acceptable points larger with distance
             }],
+            remappings=[
+                ('/way_point', '/way_point_bufonsky'),
+            ],
         ),
 
         # ---- terrain analysis ext (global map for far_planner) ----
@@ -119,6 +122,9 @@ def generate_launch_description():
                 'ceilingFilteringThre': 2.0,
                 'localTerrainMapRadius': 4.0,
             }],
+            remappings=[
+                ('/way_point', '/way_point_bufonsky'),
+            ],
         ),
 
         # ---- local planner (obstacle avoidance + path following) ----
@@ -168,6 +174,9 @@ def generate_launch_description():
                 'goalX':               0.0,
                 'goalY':               0.0,
             }],
+            remappings=[
+                ('/way_point', '/way_point_bufonsky'),
+            ],
         ),
 
         Node(
@@ -205,6 +214,9 @@ def generate_launch_description():
                 'autonomySpeed':    2.0,
                 'joyToSpeedDelay':  2.0,
             }],
+            remappings=[
+                ('/way_point', '/way_point_bufonsky'),
+            ],
         ),
 
         # Node(
@@ -230,6 +242,7 @@ def generate_launch_description():
                 ('/terrain_cloud',      '/terrain_map_ext'),
                 ('/scan_cloud',         '/registered_scan'),
                 ('/terrain_local_cloud','/terrain_map'),
+                ('/way_point', '/way_point_bufonsky'),
             ],
         ),
 
@@ -242,6 +255,9 @@ def generate_launch_description():
             arguments=['-d', rviz_path],
             parameters=[{'use_sim_time': False}],
             condition=IfCondition(LaunchConfiguration('rviz')),
+            remappings=[
+                ('/way_point', '/way_point_bufonsky'),
+            ],
         ),
     ]
 
