@@ -6,9 +6,7 @@ Starts the full exploration stack on top of the running sim:
   - terrain_analysis_ext : builds /terrain_map_ext (global terrain)
   - local_planner        : obstacle-aware path selection
   - pathFollower         : converts waypoints to velocity, /nav_vel (twist_mux input)
-  - tare_planner         : autonomous coverage exploration
-  - far_planner          : builds visibility graph in background, navigates home after exploration
-  - exploration_relay    : hands off waypoints from TARE to FAR when exploration finishes
+  - tare_planner         : autonomous coverage exploration (replaces far_planner)
 
 Prerequisites (provided by sim.launch.py + a2_bridge):
   /state_estimation  - ground-truth odometry (published by a2_bridge in a2_sim_utils)
@@ -44,7 +42,6 @@ def generate_launch_description():
     a2_ros_dir      = get_package_share_directory('a2_ros')
     rviz_path        = os.path.join(a2_ros_dir, 'rviz', 'exploration.rviz')
     tare_config      = os.path.join(a2_ros_dir, 'config', 'autonomy', 'tare_a2.yaml')
-    far_config       = os.path.join(a2_ros_dir, 'config', 'autonomy', 'far_a2.yaml')
 
     rviz_arg = DeclareLaunchArgument(
         'rviz',
@@ -61,14 +58,14 @@ def generate_launch_description():
             package='terrain_analysis',
             executable='terrainAnalysis',
             name='terrainAnalysis',
-            output='log',
+            output='screen',
             parameters=[{
                 'scanVoxelSize':       0.05,
                 'decayTime':           10.0,
                 'noDecayDis':          0.0,
                 'clearingDis':         8.0,
                 'useSorting':          True,
-                'quantileZ':           0.25,
+                'quantileZ':           0.3,
                 'considerDrop':        True,
                 'limitGroundLift':     True,
                 'maxGroundLift':       0.25,
@@ -97,10 +94,10 @@ def generate_launch_description():
             package='terrain_analysis_ext',
             executable='terrainAnalysisExt',
             name='terrainAnalysisExt',
-            output='log',
+            output='screen',
             parameters=[{
                 'scanVoxelSize':        0.1,
-                'decayTime':            10.0,
+                'decayTime':            45.0,
                 'noDecayDis':           0.0,
                 'clearingDis':          30.0,
                 'useSorting':           True,
@@ -123,7 +120,7 @@ def generate_launch_description():
             package='local_planner',
             executable='localPlanner',
             name='localPlanner',
-            output='log',
+            output='screen',
             parameters=[{
                 'pathFolder':          get_package_share_directory('local_planner') + '/paths',
                 'vehicleLength':       0.65,
@@ -132,11 +129,11 @@ def generate_launch_description():
                 'sensorOffsetY':       0.0,
                 'twoWayDrive':         False,
                 'laserVoxelSize':      0.05,
-                'terrainVoxelSize':    0.2,
+                'terrainVoxelSize':    0.05,
                 'useTerrainAnalysis':  True,
                 'checkObstacle':       True,
                 'checkRotObstacle':    True,
-                'adjacentRange':       3.5,
+                'adjacentRange':       2.0,               # Ajustado para entornos cerrados
                 'obstacleHeightThre':  0.17,
                 'groundHeightThre':    0.1,
                 'costHeightThre':      0.1,
@@ -145,23 +142,23 @@ def generate_launch_description():
                 'pointPerPathThre':    2,
                 'minRelZ':             -0.5,
                 'maxRelZ':             0.8,
-                'maxSpeed':            1.5,
+                'maxSpeed':            0.5,               # Ajustado
                 'dirWeight':           0.1,
                 'dirThre':             135.0,
                 'dirToVehicle':        False,
-                'pathScale':           0.4,
-                'minPathScale':        0.3,
-                'pathScaleStep':       0.15,
+                'pathScale':           0.6,
+                'minPathScale':        0.5,
+                'pathScaleStep':       0.25,
                 'pathScaleBySpeed':    True,
                 'minPathRange':        1.0,
                 'pathRangeStep':       0.5,
                 'pathRangeBySpeed':    True,
                 'pathCropByGoal':      True,
                 'autonomyMode':        True,
-                'autonomySpeed':       2.0,
+                'autonomySpeed':       0.5,               # Ajustado
                 'joyToSpeedDelay':     2.0,
                 'joyToCheckObstacleDelay': 5.0,
-                'goalClearRange':      0.4,
+                'goalClearRange':      0.2,               # Ajustado
                 'goalX':               0.0,
                 'goalY':               0.0,
             }],
@@ -171,22 +168,22 @@ def generate_launch_description():
             package='local_planner',
             executable='pathFollower',
             name='pathFollower',
-            output='log',
+            output='screen',
             parameters=[{
                 'sensorOffsetX':    0.0,
                 'sensorOffsetY':    0.0,
                 'pubSkipNum':       1,
                 'twoWayDrive':      False,
-                'lookAheadDis':     0.4,
+                'lookAheadDis':     0.3,                  # Distancia de visión ajustada para no chocar con el freno
                 'yawRateGain':      10.0,
                 'stopYawRateGain':  8.0,
                 'maxYawRate':       45.0,
-                'maxSpeed':         1.5,
+                'maxSpeed':         0.5,                  # Ajustado
                 'maxAccel':         2.0,
                 'switchTimeThre':   1.0,
                 'dirDiffThre':      0.3,
-                'stopDisThre':      0.3,
-                'slowDwnDisThre':   0.6,
+                'stopDisThre':      0.1,                  # Freno total solo muy cerca de la meta
+                'slowDwnDisThre':   0.25,                 # Frena progresivamente en los últimos 25 cm
                 'useInclRateToSlow': False,
                 'inclRateThre':     120.0,
                 'slowRate1':        0.25,
@@ -199,49 +196,20 @@ def generate_launch_description():
                 'noRotAtStop':      False,
                 'noRotAtGoal':      True,
                 'autonomyMode':     True,
-                'autonomySpeed':    2.0,
+                'autonomySpeed':    0.5,                  # Ajustado
                 'joyToSpeedDelay':  2.0,
             }],
         ),
 
         # ---- TARE planner (autonomous exploration) ----
-        # Publishes waypoints on /tare_way_point (relayed to /way_point by exploration_relay)
         Node(
             package='tare_planner',
             executable='tare_planner_node',
             name='tare_planner_node',
-            output='log',
+            output='screen',
             parameters=[tare_config],
         ),
 
-        # ---- FAR planner (visibility-graph, builds in background) ----
-        # Subscribes to /goal_point, publishes on /way_point when given a goal.
-        # During exploration it has no goal so it only builds the V-graph.
-        # After exploration, exploration_relay sends the home goal.
-        Node(
-            package='far_planner',
-            executable='far_planner',
-            name='far_planner',
-            output='log',
-            additional_env={'QT_QPA_PLATFORM': 'offscreen'},
-            parameters=[far_config],
-            remappings=[
-                ('/odom_world',          '/state_estimation'),
-                ('/terrain_cloud',       '/terrain_map_ext'),
-                ('/scan_cloud',          '/registered_scan'),
-                ('/terrain_local_cloud', '/terrain_map'),
-            ],
-        ),
-
-        # ---- exploration relay (TARE → FAR handoff) ----
-        # Forwards /tare_way_point → /way_point during exploration.
-        # When exploration_finish=true, sends home goal to FAR via /goal_point.
-        Node(
-            package='a2_ros',
-            executable='exploration_relay',
-            name='exploration_relay',
-            output='screen',
-        ),
 
         # ---- RViz ----
         Node(
