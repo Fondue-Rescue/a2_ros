@@ -16,7 +16,7 @@ far_planner:
     voxel_dim: 0.1          # increase to 0.3 if contours are noisy
 
     # Goal
-    converge_distance: 0.5
+    converge_distance: 0.1
 
     # Dynamic obstacle decay
     dynamic_obs_decay_time: 2.0

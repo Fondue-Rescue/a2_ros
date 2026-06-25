@@ -23,13 +23,13 @@ tare_planner_node:
     kExtendWayPoint : true          # extend lookahead waypoint further if it is within extend distance
     kUseLineOfSightLookAheadPoint : true  # require line-of-sight to lookahead point; pick alternative if blocked
     kNoExplorationReturnHome : true      # return to start when exploration is complete
-    kExtendWayPointDistanceBig : 4.0     # extension distance when waypoint has line-of-sight (m)
-    kExtendWayPointDistanceSmall : 2.5   # extension distance when waypoint does not have line-of-sight (m)
+    kExtendWayPointDistanceBig : 2.5     # extension distance when waypoint has line-of-sight (m)
+    kExtendWayPointDistanceSmall : 0.25   # extension distance when waypoint does not have line-of-sight (m)
     kKeyposeCloudDwzFilterLeafSize : 0.2 # voxel leaf size for downsampling keypose / registered scan clouds (m)
     kRushHomeDist : 10.0            # distance to home below which rush-home activates (m)
     kAtHomeDistThreshold : 1.5      # distance to consider robot arrived at home (m)
     kTerrainCollisionThreshold : 0.3     # terrain point intensity above this is treated as a collision obstacle
-    kLookAheadDistance : 5.0        # distance ahead on path to project lookahead waypoint (m)
+    kLookAheadDistance : 2.5        # distance ahead on path to project lookahead waypoint (m)
     kUseMomentum : false         # bias waypoint selection toward previous travel direction
     kDirectionChangeCounterThr : 6       # consecutive direction changes before momentum switch triggers
     kDirectionNoChangeCounterThr : 5     # steps without direction change before stuck detection triggers
