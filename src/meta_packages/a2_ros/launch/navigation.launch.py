@@ -73,7 +73,7 @@ def generate_launch_description():
                 'quantileZ':           0.25, # From what quantile of the sorted voxel point list to we want to take our height "PlanarPointElev"
                 'considerDrop':        True,
                 'limitGroundLift':     True, # make ground glat
-                'maxGroundLift':       0.25, # makes ground flat if it rises over this thr
+                'maxGroundLift':       0.3, # makes ground flat if it rises over this thr
                 'clearDyObs':          False,# Dynamic Obstacle Handling
                 'minDyObsDis':         0.3,  # unused if cleardyobs isnt used
                 'minDyObsAngle':       0.0,  # unused if cleardyobs isnt used
@@ -135,8 +135,8 @@ def generate_launch_description():
             output='screen',
             parameters=[{
                 'pathFolder':          get_package_share_directory('local_planner') + '/paths',
-                'vehicleLength':       0.65,
-                'vehicleWidth':        0.40,
+                'vehicleLength':       0.75,
+                'vehicleWidth':        0.50,
                 'sensorOffsetX':       0.0,
                 'sensorOffsetY':       0.0,
                 'twoWayDrive':         False,

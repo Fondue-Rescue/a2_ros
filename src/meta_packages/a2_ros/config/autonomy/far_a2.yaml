@@ -1,7 +1,7 @@
 far_planner:
   ros__parameters:
     # Robot dimensions - tuned for A2 (SMB defaults: robot_dim=0.8, vehicle_height=0.75)
-    robot_dim:      0.40   # A2 body diagonal ~0.45 m
+    robot_dim:      0.45   # A2 body diagonal ~0.45 m
     vehicle_height: 0.5    # A2 standing height ~0.5 m
 
     # Sensor
